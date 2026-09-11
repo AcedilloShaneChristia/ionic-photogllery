@@ -10,8 +10,10 @@
 import { IonFab, IonFabButton, IonIcon } from '@ionic/vue';
 import { camera } from 'ionicons/icons';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { ref as dbRef, push } from 'firebase/database';
+import { db } from '@/firebase';
 
-// Define emit to send captured photo path to parent component
+// Define emit to notify parent component if needed
 const emit = defineEmits<{
   (e: 'photo-taken', webviewPath: string): void
 }>();
@@ -19,13 +21,24 @@ const emit = defineEmits<{
 const takePhoto = async () => {
   try {
     const image = await Camera.getPhoto({
-      resultType: CameraResultType.Uri,
+      resultType: CameraResultType.Base64,
       source: CameraSource.Camera,
-      quality: 100
+      quality: 90
     });
 
-    if (image.webPath) {
-      emit('photo-taken', image.webPath);
+    if (image.base64String) {
+      // Create data URL format so standard <img> tags can render it directly
+      const photoDataUrl = `data:image/${image.format};base64,${image.base64String}`;
+
+      // Save to Firebase Realtime Database under 'photos' node
+      const photosRef = dbRef(db, 'photos');
+      await push(photosRef, {
+        url: photoDataUrl,
+        createdAt: Date.now()
+      });
+
+      // Emit path to parent component
+      emit('photo-taken', photoDataUrl);
     }
   } catch (error) {
     console.log('User cancelled or camera error:', error);
