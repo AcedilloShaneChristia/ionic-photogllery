@@ -1,30 +1,29 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar color="primary">
+    <ion-header :translucent="true">
+      <ion-toolbar>
         <ion-title>Photo Gallery</ion-title>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="ion-padding">
-      <!-- Displays the photos grid -->
-      <PhotoGalleryComponent :photos="photos" />
+    <ion-content :fullscreen="true">
+      <ion-header collapse="condense">
+        <ion-toolbar>
+          <ion-title size="large">Photo Gallery</ion-title>
+        </ion-toolbar>
+      </ion-header>
 
-      <!-- Floating camera button -->
-      <CameraComponent @photo-taken="addPhoto" />
+      <!-- Display Photo Gallery -->
+      <PhotoGalleryComponent />
+
+      <!-- Camera Floating Action Button -->
+      <CameraComponent />
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/vue';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import PhotoGalleryComponent from '@/components/PhotoGalleryComponent.vue';
 import CameraComponent from '@/components/CameraComponent.vue';
-import PhotoGalleryComponent, { UserPhoto } from '@/components/PhotoGalleryComponent.vue';
-
-const photos = ref<UserPhoto[]>([]);
-
-const addPhoto = (webviewPath: string) => {
-  photos.value.unshift({ webviewPath });
-};
 </script>
